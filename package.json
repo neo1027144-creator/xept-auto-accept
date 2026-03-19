@@ -1,0 +1,139 @@
+{
+  "name": "xept-auto-accept",
+  "displayName": "Xept Auto-Accept",
+  "description": "Automatically accepts agent steps, terminal commands, and permission prompts in Antigravity IDE. Zero-config, background mode, safety-first.",
+  "version": "0.2.3",
+  "publisher": "Xept",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/neo1027144-creator/xept-auto-accept.git"
+  },
+  "homepage": "https://github.com/neo1027144-creator/xept-auto-accept",
+  "engines": {
+    "vscode": "^1.68.0"
+  },
+  "categories": ["Other"],
+  "icon": "icon.png",
+  "activationEvents": ["*"],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "xept.toggle",
+        "title": "Xept: Toggle Auto-Accept ON/OFF"
+      },
+      {
+        "command": "xept.restoreShortcuts",
+        "title": "Xept: Restore Original Shortcuts (还原快捷方式)"
+      },
+      {
+        "command": "xept.openDashboard",
+        "title": "Xept: Open Dashboard"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "xept.openDashboard",
+        "key": "ctrl+shift+x",
+        "mac": "cmd+shift+x"
+      }
+    ],
+    "configuration": {
+      "title": "Xept Auto-Accept",
+      "properties": {
+        "xept.cdpPort": {
+          "type": "number",
+          "default": 9222,
+          "scope": "machine",
+          "description": "CDP debugging port. Xept will also scan nearby ports automatically."
+        },
+        "xept.blockedCommands": {
+          "type": "array",
+          "default": [],
+          "items": { "type": "string" },
+          "scope": "application",
+          "description": "Terminal command patterns to NEVER auto-run (e.g. 'rm -rf', 'git push --force')."
+        },
+        "xept.allowedCommands": {
+          "type": "array",
+          "default": [],
+          "items": { "type": "string" },
+          "scope": "application",
+          "description": "If non-empty, ONLY auto-run commands matching these patterns. Blocklist takes priority."
+        },
+        "xept.customButtonTexts": {
+          "type": "array",
+          "default": [],
+          "items": { "type": "string" },
+          "scope": "application",
+          "description": "Extra button texts to auto-click (e.g. i18n labels)."
+        },
+        "xept.autoRun": {
+          "type": "boolean",
+          "default": true,
+          "scope": "window",
+          "description": "Auto-click Run buttons for terminal commands. Dangerous commands are still blocked by the safety filter."
+        },
+        "xept.autoAcceptFileEdits": {
+          "type": "boolean",
+          "default": true,
+          "scope": "window",
+          "description": "Auto-accept file edit buttons (Accept, Accept All, Keep, Apply, Save). Set false to review diffs first."
+        },
+        "xept.autoAllow": {
+          "type": "boolean",
+          "default": true,
+          "scope": "window",
+          "description": "Auto-allow permission prompts (Allow, Always Allow, Allow Once). Set false to manually approve each permission."
+        },
+        "xept.autoRetryEnabled": {
+          "type": "boolean",
+          "default": true,
+          "scope": "window",
+          "description": "Auto-click Retry/Continue on agent errors (with circuit breaker: max 3 retries per 60s)."
+        },
+        "xept.acceptDelay": {
+          "type": "number",
+          "default": 2000,
+          "minimum": 0,
+          "maximum": 10000,
+          "scope": "window",
+          "description": "Delay in ms before auto-accepting file edits (review window). 0 = instant."
+        },
+        "xept.runDelay": {
+          "type": "number",
+          "default": 0,
+          "minimum": 0,
+          "maximum": 10000,
+          "scope": "window",
+          "description": "Delay in ms before auto-clicking Run buttons. 0 = instant."
+        },
+        "xept.retryDelay": {
+          "type": "number",
+          "default": 5000,
+          "minimum": 0,
+          "maximum": 15000,
+          "scope": "window",
+          "description": "Delay in ms before auto-clicking Retry/Continue buttons. Gives you time to decide when errors occur (e.g. quota exhausted)."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "node esbuild.config.mjs",
+    "watch": "node esbuild.config.mjs --watch",
+    "package": "npx -y @vscode/vsce package --no-dependencies",
+    "test": "npx tsx test/safety-filter.test.ts"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.68.0",
+    "@types/node": "^20.0.0",
+    "esbuild": "^0.21.0",
+    "typescript": "^5.4.0",
+    "tsx": "^4.0.0"
+  },
+  "dependencies": {
+    "ws": "^8.19.0"
+  }
+}
